@@ -1,8 +1,21 @@
+/*
+ * @Author: zhangjw zhangjiaowei@newgrand.cn
+ * @Date: 2024-08-02 16:31:49
+ * @LastEditors: zhangjw
+ * @LastEditTime: 2024-08-10 14:40:18
+ * @Description: file content
+ */
+import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
+import { Toaster } from "@/components/ui/toaster";
 
-const inter = Inter({ subsets: ["latin"] });
+// import { Providers } from "./providers";
+// import clsx from "clsx";
+
+import { cn } from "@/lib/utils";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,7 +29,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body
+        className={cn(
+          "min-h-screen bg-background font-sans antialiased",
+          inter.variable
+        )}
+      >
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }
