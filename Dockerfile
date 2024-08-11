@@ -1,35 +1,30 @@
 # 第一阶段：构建阶段
-FROM node:18 AS builder
-
-# 设置工作目录
+FROM public.ecr.aws/docker/library/node:20-slim AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+COPY . /app
 WORKDIR /app
 
-# 将 pnpm-lock.yaml 和 package.json 复制到容器中
-COPY pnpm-lock.yaml ./
-COPY package.json ./
 
-# 安装 pnpm
-RUN npm install -g pnpm
+FROM base AS prod-deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
-# 安装依赖
-RUN pnpm install --frozen-lockfile
-
-# 将项目源代码复制到容器中
-COPY . .
-
-# 构建 Next.js 应用
+FROM base AS build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 RUN pnpm run build
 
 # 第二阶段：运行阶段
 FROM node:18-alpine
 
 # 设置工作目录
-WORKDIR /app
+# WORKDIR /app
 
 # 复制构建好的文件到新的镜像中
-COPY --from=builder /app/.next .
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/package.json ./package.json
+FROM base
+COPY --from=prod-deps /app/node_modules /app/node_modules
+COPY --from=build /app/.next /app/.next
+EXPOSE 8000
 
 # 安装生产环境所需的依赖
 RUN pnpm install --only=prod --frozen-lockfile
