@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "cp -r .next package.json pnpm-lock.yaml server.js next.config.mjs ecosystem.config.js ../test-pm2 "
+    "test": "cp -r .next package.json pnpm-lock.yaml start.sh next.config.mjs ecosystem.config.js ../test-pm2 "
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
